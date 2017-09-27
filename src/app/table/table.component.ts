@@ -1,15 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { HttpService } from '../http-service.service';
 
 @Component({
   selector: 'app-table',
   templateUrl: './table.component.html',
-  styleUrls: ['./table.component.css']
+  styleUrls: ['./table.component.css'],
+  providers: [HttpService]
 })
-export class TableComponent implements OnInit {
 
-  constructor() { }
+export class TableComponent {
+ 
+	city : string;
+	receivedWeather : any;
 
-  ngOnInit() {
+ constructor( private HttpService :HttpService) {}
+
+  loadWeather() {
+    this.HttpService.getWeather(this.city).subscribe(data => {
+    this.receivedWeather = data;
+    }); 
   }
-
 }

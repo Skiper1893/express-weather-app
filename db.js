@@ -1,0 +1,2 @@
+const mongoose = require('mongoose'); // стандартная прослойка для работы с MongoDB
+const crypto = require('crypto'); // модуль node.js для выполнения различных шифровальных операций, в т.ч. для создания хэшей.

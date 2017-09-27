@@ -63,12 +63,10 @@ body {
  */
 
 .main {
-  margin-bottom: 2vh;
   padding: 20px;
 }
 @media (min-width: 768px) {
   .main {
-    margin-bottom: 2vh;
     padding-right: 40px;
     padding-left: 40px;
   }
