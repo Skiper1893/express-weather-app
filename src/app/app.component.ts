@@ -9,5 +9,4 @@ import { HttpService } from './http-service.service';
 
 export class AppComponent{
 
-  title = '';
 }
