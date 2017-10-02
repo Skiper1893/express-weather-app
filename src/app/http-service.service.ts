@@ -25,12 +25,14 @@ export class HttpService {
 
   		createUser(username, email, password) : Observable<User> {
   			return this.http.post('/user', {displayName: username, email: email, password: password})
+  			.map((res:Response) => console.log(res))
   			.catch((error:any) => {return Observable.throw(error);
   			});		
   		}
 
   		SignIn(email, password) : Observable<User> {
-  			return this.http.post('login', {email : email , password : password})
+  			return this.http.post('/login', {email : email , password : password})
+  			.map((res:Response) => console.log(res))
   			.catch((error:any) => {return Observable.throw(error);
   			});
   		}

@@ -133,7 +133,10 @@ passport.use(new JwtStrategy(jwtOptions, function (payload, done) {
 //маршрут для создания нового пользователя
 
 router.post('/user', async(ctx, next) => {
+  console.log("Попытка");
   try {
+    console.log("try");
+    console.log(ctx.request.body);
     ctx.body = await User.create(ctx.request.body);
   }
   catch (err) {
@@ -145,7 +148,9 @@ router.post('/user', async(ctx, next) => {
 //маршрут для локальной авторизации и создания JWT при успешной авторизации
 
 router.post('/login', async(ctx, next) => {
+  console.log("Попытка");
   await passport.authenticate('local', function (err, user) {
+    console.log("await");
     if (user == false) {
       ctx.body = "Login failed";
     } else {

@@ -16,6 +16,10 @@ export class AuthComponent implements OnInit{
 
   Login() {
   	this.login.SignIn(this.user.email, this.user.password);
+  	console.log("Отправлено");
+    console.log(this.user.email);
+    console.log(this.user.password);
+
   }
 
   ngOnInit() {

@@ -16,6 +16,10 @@ export class RegistrationComponent implements OnInit{
 
   Registration () {
   	this.registration.createUser(this.user.username ,this.user.email, this.user.password);
+  	console.log("Отправлено");
+    console.log(this.user.username);
+    console.log(this.user.email);
+    console.log(this.user.password);
   }
 
 	ngOnInit() {
