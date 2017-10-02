@@ -11,10 +11,13 @@ import { TableComponent } from './table/table.component';
 import { AboutComponent } from './about/about.component';
 import { MainComponent } from './main/main.component';
 import { AuthComponent } from './auth/auth.component';
+import { RegistrationComponent } from './registration/registration.component';
 
 const appRoutes: Routes = [
     { path: '', component: AboutComponent},
     { path: 'search', component: MainComponent},
+    { path: 'login', component: AuthComponent},
+    { path: 'registration', component: RegistrationComponent},
     { path: '**', component: AboutComponent }
 ];
 
@@ -26,8 +29,10 @@ const appRoutes: Routes = [
    				   TableComponent,
    				   AboutComponent,
    				   MainComponent, 
-   				   AuthComponent],
-   bootstrap:    [ AppComponent ]
+   				   AuthComponent, 
+   				   RegistrationComponent],
+   bootstrap:    [ AppComponent ],
+
 })
 
 export class AppModule { }

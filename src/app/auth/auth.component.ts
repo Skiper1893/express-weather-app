@@ -1,15 +1,28 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpService } from '../http-service.service';
+import { User } from '../user';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
-  styleUrls: ['./auth.component.css']
+  styleUrls: ['./auth.component.css'],
+  providers: [HttpService]
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent implements OnInit{
 
-  constructor() { }
+	user : User;
 
-  ngOnInit() {
+  constructor( private login : HttpService) {}
+
+  Login() {
+  	this.login.SignIn(this.user.email, this.user.password);
   }
 
+  ngOnInit() {
+  	this.user = {
+  			username : '',
+			email 	: '',
+			password : ''
+		}
+  }
 }
