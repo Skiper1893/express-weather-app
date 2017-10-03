@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpService } from '../http-service.service';
 
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
-  styleUrls: ['./about.component.css']
+  styleUrls: ['./about.component.css'],
+  providers: [HttpService]
 })
-export class AboutComponent implements OnInit {
+export class AboutComponent{
 
-  constructor() { }
+  constructor(private github_auth : HttpService) { }
 
-  ngOnInit() {
+  GithubAuth() {
+  	this.github_auth.GithubSignIn().subscribe(data => console.log(data));
   }
-
 }

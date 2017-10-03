@@ -137,12 +137,18 @@ body {
   color: #999; /* IE8 proofing */
   color: rgba(255,255,255,.5);
 }
-
-
 /*
  * Affix and center
  */
 
+/*    
+social btn-style
+*/
+
+#github_auth {
+  width: 27%;
+  display: inline-block;
+}
 @media (min-width: 768px) {
   /* Pull out the header and footer */
   .masthead {

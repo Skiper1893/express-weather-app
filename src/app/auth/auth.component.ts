@@ -8,25 +8,15 @@ import { User } from '../user';
   styleUrls: ['./auth.component.css'],
   providers: [HttpService]
 })
-export class AuthComponent implements OnInit{
+export class AuthComponent{
 
 	user : User;
+	email : string;
+	password : string;
 
   constructor( private login : HttpService) {}
 
   Login() {
-  	this.login.SignIn(this.user.email, this.user.password);
-  	console.log("Отправлено");
-    console.log(this.user.email);
-    console.log(this.user.password);
-
-  }
-
-  ngOnInit() {
-  	this.user = {
-  			username : '',
-			email 	: '',
-			password : ''
-		}
+  	this.login.SignIn(this.email, this.password).subscribe(data => console.log(data));
   }
 }

@@ -3,6 +3,7 @@
 const Koa         = require('koa'),
 	  send          = require('koa-send'),
 	  router        = require('koa-router')(),
+    Router        = require('koa-router'),
 	  serve         = require('koa-static'),
 	  bodyParser    = require('koa-bodyparser'),
 	  rp 	          = require('request-promise'),
@@ -10,8 +11,8 @@ const Koa         = require('koa'),
     passport = require('koa-passport'), //реализация passport для Koa
     LocalStrategy = require('passport-local'), //локальная стратегия авторизации
     JwtStrategy = require('passport-jwt').Strategy, // авторизация через JWT
-    ExtractJwt = require('passport-jwt').ExtractJwt; // авторизация через JWT
-
+    ExtractJwt = require('passport-jwt').ExtractJwt, // авторизация через JWT
+    passport_github = require('./github_auth');
 
 const jwtsecret = "mysecretkey"; // ключ для подписи JWT
 const jwt = require('jsonwebtoken'); // аутентификация  по JWT для hhtp
@@ -32,19 +33,34 @@ app.use(async (ctx, next) => {
   console.log('X-Response-Time', `${ms}ms`);
 });
 
-app.use(passport.initialize()); // сначала passport
+
+//////////////---------Github Auth---------////////////
+
+router.get('/auth/github', passport.authenticate('github', {scope: ['user','repo']}));
+router.get('/auth/github/callback',
+  passport.authenticate('github', {successRedirect:'/search', failureRedirect: '/'})
+);
+
+function *authed(next){
+  if (this.req.isAuthenticated()){
+    yield next;
+  } else {
+    this.redirect('/auth/github');
+  }
+}
+
+app.use(passport.initialize());
 app.use(serve(__dirname + '/src'));
 router.use(bodyParser());
 app.use(router.routes());
-const server = app.listen(port);
-
+const server = app.listen(port, () => console.log(`app listen on ${port}`));
 
 mongoose.Promise = Promise; // Просим Mongoose использовать стандартные Промисы
 mongoose.set('debug', true);  // Просим Mongoose писать все запросы к базе в консоль. Удобно для отладки кода
-mongoose.connect('mongodb://localhost/auth_weather-app'); // Подключаемся к базе test на локальной машине. Если базы нет, она будет создана автоматически.
+mongoose.connect('mongodb://localhost/auth_weather-app'); // Подключаемся к базе на локальной машине. Если базы нет, она будет создана автоматически.
 mongoose.connection.on('error', console.error);
 
-//---------Схема и модель пользователя------------------//
+//---------Схема и модель пользователя---------//
 
 const userSchema = new mongoose.Schema({
   displayName: String,
@@ -56,7 +72,8 @@ const userSchema = new mongoose.Schema({
   passwordHash: String,
   salt: String,
 }, {
-  timestamps: true
+  timestamps: true,
+  favorite_city: String
 });
 
 userSchema.virtual('password')
@@ -132,12 +149,16 @@ passport.use(new JwtStrategy(jwtOptions, function (payload, done) {
 
 //маршрут для создания нового пользователя
 
-router.post('/user', async(ctx, next) => {
-  console.log("Попытка");
+router.post('/api/user', async(ctx, next) => {
+let data = {
+  displayName : ctx.request.body.displayName,
+  email : ctx.request.body.email,
+  password : ctx.request.body.password
+}
   try {
     console.log("try");
     console.log(ctx.request.body);
-    ctx.body = await User.create(ctx.request.body);
+    ctx.body = new User(data);
   }
   catch (err) {
     ctx.status = 400;
@@ -147,20 +168,20 @@ router.post('/user', async(ctx, next) => {
 
 //маршрут для локальной авторизации и создания JWT при успешной авторизации
 
-router.post('/login', async(ctx, next) => {
-  console.log("Попытка");
+router.post('/api/login', async(ctx, next) => {
+  let user = ctx.request.body;
   await passport.authenticate('local', function (err, user) {
-    console.log("await");
+  console.log(user);
+
     if (user == false) {
       ctx.body = "Login failed";
     } else {
-      //--payload - информация которую мы храним в токене и можем из него получать
       const payload = {
         id: user.id,
         displayName: user.displayName,
         email: user.email
       };
-      const token = jwt.sign(payload, jwtsecret); //здесь создается JWT
+      const token = jwt.sign(payload, jwtsecret);
       
       ctx.body = {user: user.displayName, token: 'JWT ' + token};
     }
@@ -170,7 +191,7 @@ router.post('/login', async(ctx, next) => {
 
 // маршрут для авторизации по токену
 
-router.get('/custom', async(ctx, next) => {
+router.get('/api/custom', async(ctx, next) => {
   
   await passport.authenticate('jwt', function (err, user) {
     if (user) {
@@ -203,8 +224,6 @@ io.on('connection', socketioJwt.authorize({
 
 router.post('/api/search', (async (ctx, next) => {
     
-    let that = this;
-    let weather;
   	let city =  ctx.request.body.city;
 
 	  const apiKey = '79db9599e21f6fa00d36539b86173cd3';
@@ -225,7 +244,6 @@ router.post('/api/search', (async (ctx, next) => {
     .catch(function (err) {
         throw(err);
     });
-   console.log(ctx.response.body);
    
 }));
 
