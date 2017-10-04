@@ -8,22 +8,38 @@ const Koa         = require('koa'),
 	  bodyParser    = require('koa-bodyparser'),
 	  rp 	          = require('request-promise'),
     _             = require('lodash'),
-    passport = require('koa-passport'), //реализация passport для Koa
+    passport      = require('koa-passport'), //реализация passport для Koa
     LocalStrategy = require('passport-local'), //локальная стратегия авторизации
-    JwtStrategy = require('passport-jwt').Strategy, // авторизация через JWT
-    ExtractJwt = require('passport-jwt').ExtractJwt, // авторизация через JWT
-    passport_github = require('./github_auth');
+    JwtStrategy   = require('passport-jwt').Strategy, // авторизация через JWT
+    ExtractJwt    = require('passport-jwt').ExtractJwt, // авторизация через JWT
+    passport_github = require('./github_auth'),
+    passport_google = require('./google_auth'),
+    jwtsecret     = "mysecretkey", // ключ для подписи JWT
+    jwt           = require('jsonwebtoken'), // аутентификация  по JWT для hhtp
+    socketioJwt   = require('socketio-jwt'), // аутентификация  по JWT для socket.io
+    socketIO      = require('socket.io'),
+    mongoose      = require('mongoose'), // стандартная прослойка для работы с MongoDB
+    crypto        = require('crypto'), // модуль node.js для выполнения различных шифровальных операций, в т.ч. для создания хэшей.
+    cors          = require('koa2-cors'),
+    app           = new Koa(),
+    port          = 4000;
 
-const jwtsecret = "mysecretkey"; // ключ для подписи JWT
-const jwt = require('jsonwebtoken'); // аутентификация  по JWT для hhtp
-const socketioJwt = require('socketio-jwt'); // аутентификация  по JWT для socket.io
 
-const socketIO = require('socket.io');
+app.use(cors({
+  origin: function(ctx) {
+    if (ctx.url === '/test') {
+      return false;
+    }
+    return '*';
+  },
+  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+  maxAge: 5,
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'DELETE'],
+  allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  })
+);
 
-const mongoose = require('mongoose'); // стандартная прослойка для работы с MongoDB
-const crypto = require('crypto'); // модуль node.js для выполнения различных шифровальных операций, в т.ч. для создания хэшей.
-const app = new Koa();
-const port = 4000;
 
 // server x-response-time
 app.use(async (ctx, next) => {
@@ -34,7 +50,7 @@ app.use(async (ctx, next) => {
 });
 
 
-//////////////---------Github Auth---------////////////
+//---------------------------------------------------Github Auth---------//
 
 router.get('/auth/github', passport.authenticate('github', {scope: ['user','repo']}));
 router.get('/auth/github/callback',
@@ -49,6 +65,21 @@ function *authed(next){
   }
 }
 
+//---------------------------------------------------Google Auth---------//
+
+router.get('/auth/google',
+  passport.authenticate('google', { scope: 
+    [ 'https://www.googleapis.com/auth/plus.login',
+    , 'https://www.googleapis.com/auth/plus.profile.emails.read' ] }
+));
+ 
+router.get( '/auth/google/callback', 
+    passport.authenticate( 'google', { 
+        successRedirect: '/auth/google/success',
+        failureRedirect: '/auth/google/failure'
+  })
+);
+
 app.use(passport.initialize());
 app.use(serve(__dirname + '/src'));
 router.use(bodyParser());
@@ -60,7 +91,8 @@ mongoose.set('debug', true);  // Просим Mongoose писать все за�
 mongoose.connect('mongodb://localhost/auth_weather-app'); // Подключаемся к базе на локальной машине. Если базы нет, она будет создана автоматически.
 mongoose.connection.on('error', console.error);
 
-//---------Схема и модель пользователя---------//
+
+//-----------------------------------Схема и модель пользователя---------//
 
 const userSchema = new mongoose.Schema({
   displayName: String,
@@ -168,7 +200,7 @@ let data = {
 
 //маршрут для локальной авторизации и создания JWT при успешной авторизации
 
-router.post('/api/login', async(ctx, next) => {
+router.post('/api/login', async(ctx, next) => {io
   let user = ctx.request.body;
   await passport.authenticate('local', function (err, user) {
   console.log(user);
@@ -204,7 +236,7 @@ router.get('/api/custom', async(ctx, next) => {
   
 });
 
-//---Socket Communication-----//
+//----------------------------------Socket Communication-----//
 
 let io = socketIO(server);
 
@@ -213,14 +245,12 @@ io.on('connection', socketioJwt.authorize({
   timeout: 15000
 })).on('authenticated', function (socket) {
   
-  console.log('Это мое имя из токена: ' + socket.decoded_token.displayName);
-  
   socket.on("clientEvent", (data) => {
     console.log(data);
   })
 });
 
-//---Get weather API promise-----//
+//--------------------------------Get weather API promise-----//
 
 router.post('/api/search', (async (ctx, next) => {
     

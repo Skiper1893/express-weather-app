@@ -17,6 +17,5 @@ export class AuthComponent{
   constructor( private login : HttpService) {}
 
   Login() {
-  	this.login.SignIn(this.email, this.password).subscribe(data => console.log(data));
-  }
+  	this.login.SignIn(this.user).subscribe(data => console.log(data));
 }

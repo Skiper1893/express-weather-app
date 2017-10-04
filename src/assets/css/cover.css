@@ -149,6 +149,12 @@ social btn-style
   width: 27%;
   display: inline-block;
 }
+#google_auth {
+  width: 27%;
+  display: inline-block;
+  margin: 0 0 1px 3px;
+}
+
 @media (min-width: 768px) {
   /* Pull out the header and footer */
   .masthead {

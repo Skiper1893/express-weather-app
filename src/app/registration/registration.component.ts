@@ -15,15 +15,8 @@ export class RegistrationComponent{
  email : string;
  password : string;
 
-  constructor(private registration: HttpService) { }
-
-
-
+constructor(private registration: HttpService) { }
   Registration () {
-  	this.registration.createUser(this.username ,this.email, this.password).subscribe(data => console.log(data));
-  	console.log("Отправлено");
-    // console.log(this.username);
-    // console.log(this.email);
-    // console.log(this.password);
+  	this.registration.createUser(this.user).subscribe(data => console.log(data));
   }
 }
