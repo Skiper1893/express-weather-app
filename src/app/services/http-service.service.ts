@@ -6,9 +6,8 @@ import { Router } from '@angular/router';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/observable/throw';
-import { Weather } from './weather';
-import { User }	from './user';
-
+import { Weather } from '../weather';
+import { User }	from '../user';
 
 @Injectable()
 
@@ -26,8 +25,8 @@ export class HttpService {
 
   		createUser(user) : Observable<any> {
   			let headers = new Headers();
-        	headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        	headers.append('WWW-Authenticate', 'Server-Authorization');
+        	headers.append('Content-Type', 'application/json');
+
         	let urlSearchParams = new URLSearchParams();
         	urlSearchParams.append('displayName', user.displayName);
         	urlSearchParams.append('email', user.email);
@@ -42,8 +41,8 @@ export class HttpService {
 
   		SignIn(user) : Observable<any> {
   			let headers = new Headers();
-        	headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        	headers.append('WWW-Authenticate', 'Server-Authorization');
+        	headers.append('Content-Type', 'application/json');
+
         	let urlSearchParams = new URLSearchParams();
         	urlSearchParams.append('email', user.email);
         	urlSearchParams.append('password', user.password);

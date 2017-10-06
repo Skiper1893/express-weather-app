@@ -1,22 +1,32 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpService } from '../http-service.service';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+
 
 @Component({
   selector: 'app-about',
   templateUrl: './about.component.html',
   styleUrls: ['./about.component.css'],
-  providers: [HttpService]
+  providers: [AuthService]
 })
 export class AboutComponent{
 
-  constructor(private soc_auth : HttpService) { }
-
-  GithubAuth() {
-  	this.soc_auth.GithubSignIn().subscribe(data => console.log(data));
-  }
+  constructor(private soc_auth : AuthService, private router: Router) { }
 
   GoogleAuth() {
-  	this.soc_auth.GoogleSignIn().subscribe(data => console.log(data));
+  	this.soc_auth.GoogleAuth().subscribe(data => {
+    if (data) {
+        this.soc_auth.storeUserData(data.token);
+        console.log(data);
+        this.router.navigate(['/search']);
+      }
+    }, err => {
+      console.log(err);
+        this.router.navigate(['/']);
+    });
   }
+
+
+
   
 }

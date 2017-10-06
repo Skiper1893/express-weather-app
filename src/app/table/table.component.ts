@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { HttpService } from '../http-service.service';
+import { HttpService } from '../services/http-service.service';
 
 @Component({
   selector: 'app-table',
