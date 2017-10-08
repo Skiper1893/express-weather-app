@@ -1,18 +1,49 @@
-const express = require('express');
-const router = express.Router();
-const passport = require('passport');
-const jwt = require('jsonwebtoken');
-const _ = require('lodash');
-const validator = require('validator');
+const express   = require('express'),
+router    = express.Router(),
+passport  = require('passport'),
+jwt       = require('jsonwebtoken'),
+_         = require('lodash'),
+validator = require('validator'),
+rp        = require('request-promise'),
+config    = require('../config/db'),
+cors      = require('cors'),
+{User}    = require('../models/user'),
+path      = require('path');
 
-const config = require('../config/db');
-const {User} = require('../models/user');
 
-var path = require('path');
+
+router.post('/search', (async (req, res) => {
+  console.log(req);
+  console.log(req.body);
+  console.log(req.body.city);
+
+    let city =  req.body.city;
+
+    const apiKey = '79db9599e21f6fa00d36539b86173cd3';
+    
+    var options = {
+      
+    uri: `http://api.openweathermap.org/data/2.5/forecast?q=${city}&units=imperial&appid=7b359dd1309d346d33a02be668584fd3`,
+    headers: {
+        'User-Agent': 'Request-Promise'
+    },
+    json: true
+  }
+ 
+ res.body = await rp(options)
+    .then(function(city) {
+          // console.log(city.list);
+   return city.list;
+})
+    .catch(function (err) {
+        throw(err);
+    });
+
+    console.log(res.body[0]);
+}));
 
 router.post('/register', (req, res) => {
 
-  
   let body = _.pick(req.body, ['email', 'password', 'username']);
   let newUser = new User({local : body});
   if (!body.email || !body.password || !body.username) {
@@ -77,16 +108,16 @@ router.get('/logout', passport.authenticate('jwt', {session: false}), (req, res)
   });
 });
 
-router.get('/auth/facebook', passport.authenticate('facebook', {scope : ['email']}));
+router.get('/auth/facebook', cors(), passport.authenticate('facebook', {scope : ['email']}));
 
 router.get('/auth/facebook/callback',  passport.authenticate('facebook', {session: false}), (req, res) => {
   const token = jwt.sign(req.user, config.secret, {expiresIn: 604800});
   res.header('Authorization', 'JWT ' + token).redirect('/');
 });
 
-router.get('/auth/google', passport.authenticate('google', {scope: ['profile', 'email']}));
+router.get('/auth/google',cors() ,passport.authenticate('google', {scope: ['profile', 'email']}));
 
-router.get('/auth/google/callback',  passport.authenticate('google', {session: false}), (req, res) => {
+router.get('/auth/google/callback', cors() ,  passport.authenticate('google', {session: false}), (req, res) => {
   const token = jwt.sign(req.user, config.secret, {expiresIn: 604800});
   res.header('Authorization', 'JWT ' + token).redirect('/search');
 });

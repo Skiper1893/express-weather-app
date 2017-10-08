@@ -25,8 +25,4 @@ export class AboutComponent{
         this.router.navigate(['/']);
     });
   }
-
-
-
-  
 }

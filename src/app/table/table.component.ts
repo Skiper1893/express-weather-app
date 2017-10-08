@@ -16,8 +16,10 @@ export class TableComponent {
  constructor( private HttpService :HttpService) {}
 
   loadWeather() {
+    console.log(this.city);
     this.HttpService.getWeather(this.city).subscribe(data => {
-    this.receivedWeather = data;
+    // this.receivedWeather = data.body;
+    console.log(data);
     }); 
   }
 }

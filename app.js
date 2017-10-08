@@ -18,11 +18,15 @@ mongoose.connection.on('error', (err) => {
 });
 
 const app = express();
-const port = 4000;
+const port = 3000;
 
+// app.use(function(req, res, next) {
+//   res.header("Access-Control-Allow-Origin", "*");
+//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+//   next();
+// });
 app.use(cors());
-
-app.use(express.static(__dirname + 'src'));
+app.use(express.static(path.join(__dirname, 'dist')));
 
 //router middleware
 const users = require('./server/routes/index');
@@ -38,6 +42,10 @@ require('./server/config/passport')(passport);
 
 //routes
 app.use('/api', users);
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist/index.html'));
+});
 
 app.listen(port, ()=>{
   console.log('Server started listen on port: ' + port);
