@@ -1,4 +1,5 @@
 const express   = require('express'),
+app       = express();
 router    = express.Router(),
 passport  = require('passport'),
 jwt       = require('jsonwebtoken'),
@@ -8,9 +9,16 @@ rp        = require('request-promise'),
 config    = require('../config/db'),
 cors      = require('cors'),
 {User}    = require('../models/user'),
-path      = require('path');
+path      = require('path'),
+port      = 3000;
 
 
+app.use(function(req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "*");
+  res.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept");
+  next();
+});
 
 router.post('/search', (async (req, res) => {
   console.log(req);
@@ -30,7 +38,7 @@ router.post('/search', (async (req, res) => {
     json: true
   }
  
- res.body = await rp(options)
+ let weather = await rp(options)
     .then(function(city) {
           // console.log(city.list);
    return city.list;
@@ -39,7 +47,7 @@ router.post('/search', (async (req, res) => {
         throw(err);
     });
 
-    console.log(res.body[0]);
+    res.send(weather);
 }));
 
 router.post('/register', (req, res) => {
@@ -74,7 +82,9 @@ router.post('/login', (req, res) => {
 
   User.getUserByEmail(email, (err, user) => {
 
-    if (err) {return next(err);}
+    if (err) {
+      return next(err);
+    }
 
     if (!user) {
       res.status(404).json({success: false, message: 'E-mail: '+ email +' does not exist'});
@@ -108,23 +118,87 @@ router.get('/logout', passport.authenticate('jwt', {session: false}), (req, res)
   });
 });
 
-router.get('/auth/facebook', cors(), passport.authenticate('facebook', {scope : ['email']}));
+
+
+//---------------Github Oauth---------------//
+var GitHubStrategy = require('passport-github').Strategy;
+
+passport.use(new GitHubStrategy({
+    clientID: '32c81517fb4b3d3e0df3',
+    clientSecret: '7cc85ff6663b45603d4e9785ebd5cf4828abd9aa',
+    callbackURL: "http://localhost:3000/api/auth/github/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ githubId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+
+
+router.get('/auth/github',
+  passport.authenticate('github'));
+
+router.get('/auth/github/callback', 
+  passport.authenticate('github', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    res.header('Access-Control-Allow-Origin', 'example.com');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    res.redirect('/search');
+  });
+
+
+// const githubOAuth = require('github-oauth')({
+//   githubClient: '32c81517fb4b3d3e0df3',
+//   githubSecret: '7cc85ff6663b45603d4e9785ebd5cf4828abd9aa',
+//   baseURL: 'http://localhost:' + port,
+//   loginURI: '/auth/github',
+//   callbackURI: '/auth/github/callback'
+// })
+
+// router.get("api/auth/github", function(req, res){
+//   console.log("started oauth");
+//   return githubOAuth.login(req, res);
+// });
+
+// router.get("api/auth/github/callback", function(req, res){
+//   console.log("received callback");
+//   return githubOAuth.callback(req, res);
+// });
+
+// githubOAuth.on('error', function(err) {
+//   console.error('there was a login error', err)
+// })
+
+// githubOAuth.on('token', function(token, serverResponse) {
+//   serverResponse.end(JSON.stringify(token))
+// })
+
+//---------------FaceBook OAuth---------------//
+router.get('/auth/facebook',passport.authenticate('facebook', {scope : ['email']}));
 
 router.get('/auth/facebook/callback',  passport.authenticate('facebook', {session: false}), (req, res) => {
   const token = jwt.sign(req.user, config.secret, {expiresIn: 604800});
-  res.header('Authorization', 'JWT ' + token).redirect('/');
-});
-
-router.get('/auth/google',cors() ,passport.authenticate('google', {scope: ['profile', 'email']}));
-
-router.get('/auth/google/callback', cors() ,  passport.authenticate('google', {session: false}), (req, res) => {
-  const token = jwt.sign(req.user, config.secret, {expiresIn: 604800});
+  res.header('Access-Control-Allow-Origin', 'example.com');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Authorization', 'JWT ' + token).redirect('/search');
 });
-
-
 router.get('/connect/facebook', passport.authenticate('jwt', {session: false}), passport.authorize('facebook', {scope : ['email']}));
 
+//---------------Google OAuth---------------//
+
+router.get('/auth/google' ,passport.authenticate('google', {scope: ['profile', 'email']}));
+
+router.get('/auth/google/callback', passport.authenticate('google', {session: false}), (req, res) => {
+  const token = jwt.sign(req.user, config.secret, {expiresIn: 604800});
+  res.header('Access-Control-Allow-Origin', 'example.com');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  res.header('Authorization', 'JWT ' + token).redirect('/search');
+});
 router.get('/connect/google', passport.authenticate('jwt', {session: false}), passport.authorize('google', {scope: ['profile', 'email']}));
 
 module.exports = router;

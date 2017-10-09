@@ -33,6 +33,7 @@
     "cors": "^2.8.4",
     "express": "^4.16.1",
     "express-session": "^1.15.6",
+    "github-oauth": "^0.2.2",
     "jsonwebtoken": "^7.3.0",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.31",

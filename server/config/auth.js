@@ -10,7 +10,7 @@ module.exports = {
     'googleAuth' : {
         'clientID'      : '810580040492-2eevn86bpu5t2eha62nm9j7e0n354hmk.apps.googleusercontent.com',
         'clientSecret'  : 'lTNZ52z0uY_Q6IfdYGVpv8cg',
-        'callbackURL'   : 'http://localhost/users/auth/google/callback'
+        'callbackURL'   : 'http://localhost:3000/api/auth/google/callback'
     }
     // 'githubAuth' : {
     //     'clientID'      : '32c81517fb4b3d3e0df3',

@@ -20,12 +20,14 @@ mongoose.connection.on('error', (err) => {
 const app = express();
 const port = 3000;
 
-// app.use(function(req, res, next) {
-//   res.header("Access-Control-Allow-Origin", "*");
-//   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-//   next();
-// });
-app.use(cors());
+let corsOptions = {
+    origin: 'http://my-weather-app.com',
+    optionsSuccessStatus: 200, 
+    credentials: true
+};
+
+app.use(cors(corsOptions));
+
 app.use(express.static(path.join(__dirname, 'dist')));
 
 //router middleware

@@ -11,10 +11,10 @@
             <p class="lead"><a routerLink="/login" class="btn btn-lg btn-default">Login</a></p>
             <p class="lead"><a routerLink="/registration" class="btn btn-lg btn-default">Sign In</a></p>
               <div class="soc_icon">
-                  <a class="btn btn-block btn-social btn-github" id="github_auth" href="https://a5d41477.ngrok.io/auth/github">
+                  <a class="btn btn-block btn-social btn-github" id="github_auth" (click)="GithubAuthentification()">
                   <span class="fa fa-github"></span> Sign in with GitHub
                 </a>
-                  <a class="btn btn-block btn-social btn-google" id="google_auth" (click)="GoogleAuth()">
+                  <a class="btn btn-block btn-social btn-google" id="google_auth" (click)="GoogleAuthentification()">
                   <span class="fa fa-google"></span> Sign in with Google
                 </a>
             </div>

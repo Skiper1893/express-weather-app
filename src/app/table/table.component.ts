@@ -18,8 +18,7 @@ export class TableComponent {
   loadWeather() {
     console.log(this.city);
     this.HttpService.getWeather(this.city).subscribe(data => {
-    // this.receivedWeather = data.body;
-    console.log(data);
+    this.receivedWeather = data;
     }); 
   }
 }

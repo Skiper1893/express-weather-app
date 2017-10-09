@@ -27,20 +27,14 @@ export class HttpService {
   		}
 
   		GithubSignIn() {
-  			console.log('github');
-  			let headers = new Headers();
-        headers.append('Api-User-Agent', 'Example/1.0');
-  			return this.http.get('/auth/github', { headers : headers})
+  			return this.http.get('/auth/github')
   			.map((res:Response) => console.log('res'))
   			.catch((error:any) => {return Observable.throw(error);
   			});
   		}
 
   		GoogleSignIn() {
-  			console.log('google');
-  			let headers = new Headers();
-        	headers.append('Api-User-Agent', 'Example/1.0');
-  			return this.http.get('api/auth/google', { headers : headers})
+  			return this.http.get('api/auth/google')
   			.map((res:Response) => console.log(res))
   			.catch((error:any) => {return Observable.throw(error);
   			});

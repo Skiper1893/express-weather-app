@@ -144,7 +144,7 @@ body {
 /*    
 social btn-style
 */
-
+/* Custom properties */
 #github_auth {
   width: 27%;
   display: inline-block;
@@ -153,6 +153,18 @@ social btn-style
   width: 27%;
   display: inline-block;
   margin: 0 0 1px 3px;
+}
+
+.table-weather>tbody>tr:nth-child(odd)>td { 
+  background-color: rgba(249, 249, 249, 0.3);
+}
+
+.table {
+  margin-bottom: 8vh;
+}
+
+.table-responsive {
+  padding-top: 5vh;
 }
 
 @media (min-width: 768px) {
