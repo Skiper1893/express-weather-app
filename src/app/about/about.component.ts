@@ -13,8 +13,8 @@ export class AboutComponent{
 
   constructor(private soc_auth : AuthService, private router: Router) { }
 
-  GoogleAuth() {
-  	this.soc_auth.GoogleAuth().subscribe(data => {
+  GoogleAuthentification() {
+    this.soc_auth.GoogleAuth().subscribe(data => {
     if (data) {
         this.soc_auth.storeUserData(data.token);
         console.log(data);
@@ -26,7 +26,16 @@ export class AboutComponent{
     });
   }
 
-
-
-  
+  GithubAuthentification() {
+    this.soc_auth.GithubAuth().subscribe(data => {
+    if (data) {
+        this.soc_auth.storeUserData(data.token);
+        console.log(data);
+        this.router.navigate(['/search']);
+      }
+    }, err => {
+      console.log(err);
+        this.router.navigate(['/']);
+    });
+  }
 }

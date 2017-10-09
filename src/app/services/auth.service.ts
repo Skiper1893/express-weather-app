@@ -14,7 +14,24 @@ export class AuthService {
   }
 
   GoogleAuth() {
+    let headers = new Headers();
+        headers.append('Access-Control-Allow-Origin', 'http://my-weather-app.com');
+        headers.append('Access-Control-Allow-Methods', 'GET');
+        headers.append('Access-Control-Allow-Headers', 'X-Custom-Header');
+        headers.append('Host', 'github.com');
     const ep = this.prepEndpoint('api/auth/google');
+    return this.http.get(ep)
+    .map(res => res.json());
+  }
+
+  GithubAuth() {
+    let headers = new Headers();
+        headers.append('Access-Control-Allow-Origin', '*');
+        headers.append('Access-Control-Allow-Methods', 'GET');
+        headers.append('Access-Control-Allow-Headers', 'X-Custom-Header');
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+
+    const ep = this.prepEndpoint('api/auth/github');
     return this.http.get(ep)
     .map(res => res.json());
   }
@@ -65,10 +82,6 @@ export class AuthService {
   }
 
   prepEndpoint(ep) {
-    if (this.isDev) {
-      return ep;
-    } else {
       return 'http://localhost/' + ep;
     }
-  }
 }

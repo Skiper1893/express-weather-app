@@ -63,7 +63,13 @@
 .main {
   margin-bottom: 2vh;
   padding: 20px;
+  height: 100vh;
+  background-color: rgba(70, 72, 76,0.5);
+  overflow: auto;
 }
+
+
+
 @media (min-width: 768px) {
   .main {
     margin-bottom: 2vh;
