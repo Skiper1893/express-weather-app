@@ -48,9 +48,11 @@ export class HttpService {
         loadToken() {
           const token = localStorage.getItem('id_token');
           this.authToken = token;
+          console.log(this.authToken);
         }
 
         loggedIn() {
+          console.log("loggedIn");
           return tokenNotExpired();
         }
 

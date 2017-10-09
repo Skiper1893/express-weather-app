@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   	username :String,
     email : String,
     password : String,
+    favorite_city : [String]
   }
 });
 
@@ -32,6 +33,10 @@ UserSchema.statics.addSocketId = function (data, callback) {
   User.update({_id: data._id}, data.value ,callback);
 };
 
+UserSchema.statics.addFavoriteCity = (data, callback) => {
+  User.updateOne()
+};
+
 UserSchema.pre('save', function(next) {
     var user = this;
 
@@ -46,6 +51,8 @@ UserSchema.pre('save', function(next) {
         next();
     }
 });
+
+
 
 const User = mongoose.model('User', UserSchema);
 module.exports = {User};

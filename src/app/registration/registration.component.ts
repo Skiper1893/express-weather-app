@@ -44,6 +44,7 @@ constructor( private validateService : ValidateService,
     // Register user
     this.authService.registerUser(user).subscribe(data => {
       if (data.success) {
+        console.log(data);
         console.log('success');
         this.router.navigate(['/login']);
       }

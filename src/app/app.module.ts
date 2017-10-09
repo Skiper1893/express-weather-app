@@ -11,11 +11,16 @@ import { TableComponent } from './table/table.component';
 import { AboutComponent } from './about/about.component';
 import { MainComponent } from './main/main.component';
 import { AuthComponent } from './auth/auth.component';
+import { AuthGuard } from './guards/auth.guard';
 import { RegistrationComponent } from './registration/registration.component';
+
+import { ValidateService } from './services/validate.service';
+import { AuthService } from './services/auth.service';
+import { HttpService } from './services/http-service.service';
 
 const appRoutes: Routes = [
     { path: '', component: AboutComponent},
-    { path: 'search', component: MainComponent},
+    { path: 'search', component: MainComponent, canActivate: [AuthGuard]},
     { path: 'login', component: AuthComponent},
     { path: 'registration', component: RegistrationComponent},
     { path: '**', component: AboutComponent }
@@ -23,7 +28,7 @@ const appRoutes: Routes = [
 
 @NgModule ({
    imports:      [ BrowserModule, RouterModule.forRoot(appRoutes),HttpModule,FormsModule],
-   declarations: [ AppComponent,		
+   declarations: [ AppComponent,	
    				   HeaderComponent,
    				   FooterComponent,
    				   TableComponent,
@@ -31,6 +36,7 @@ const appRoutes: Routes = [
    				   MainComponent, 
    				   AuthComponent, 
    				   RegistrationComponent],
+   providers:    [AuthGuard, AuthService, ValidateService, HttpService],
    bootstrap:    [ AppComponent ],
 
 })
